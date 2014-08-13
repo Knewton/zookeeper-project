@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.apache.zookeeper.common.HostNameUtils;
 import org.apache.zookeeper.jmx.MBeanRegistry;
 import org.apache.zookeeper.jmx.ZKMBeanInfo;
 import org.apache.zookeeper.server.NIOServerCnxn;
@@ -120,6 +121,39 @@ public class QuorumPeer extends Thread implements QuorumStats.Provider {
         public long id;
         
         public LearnerType type = LearnerType.PARTICIPANT;
+
+        /**
+        * Reinitializes server address and election address to perform DNS
+        * resolution.
+        */
+        public void recreateSocketAddresses() {
+            if (this.addr != null) {
+                String host = HostNameUtils.getHostString(this.addr);
+                int port = this.addr.getPort();
+                InetSocketAddress newAddr = new InetSocketAddress(host, port);
+                if (newAddr.isUnresolved()) {
+                    // Don't update the address if DNS resolution failed.
+                   LOG.warn(String.format("Failed to resolve the address: %s", host));
+                } else {
+                    this.addr = newAddr;
+                    LOG.debug(String.format("Recreated quorum address for server %d: %s:%d",
+                              this.id, host, port));
+                }
+            }
+            if (this.electionAddr != null) {
+                String host = HostNameUtils.getHostString(this.electionAddr);
+                int port = this.electionAddr.getPort();
+                InetSocketAddress newAddr = new InetSocketAddress(host, port);
+                if (newAddr.isUnresolved()) {
+                    // Don't update the address if DNS resolution failed.
+                    LOG.warn(String.format("Failed to resolve the address: %s", host));
+                } else {
+                    this.electionAddr = newAddr;
+                    LOG.debug(String.format("Recreated election address for server %d: %s:%d",
+                              this.id, host, port));
+                }
+            }
+        }
     }
 
     public enum ServerState {
@@ -961,5 +995,5 @@ public class QuorumPeer extends Thread implements QuorumStats.Provider {
      */
     public QuorumCnxManager getQuorumCnxManager() {
         return qcm;
-}
+    }
 }
