@@ -127,17 +127,19 @@ public class QuorumPeer extends Thread implements QuorumStats.Provider {
         * resolution.
         */
         public void recreateSocketAddresses() {
+            LOG.warn("recreateSocketAddresses() being called");
+
             if (this.addr != null) {
                 String host = HostNameUtils.getHostString(this.addr);
                 int port = this.addr.getPort();
                 InetSocketAddress newAddr = new InetSocketAddress(host, port);
                 if (newAddr.isUnresolved()) {
                     // Don't update the address if DNS resolution failed.
-                   LOG.warn(String.format("Failed to resolve the address: %s", host));
+                    LOG.warn(String.format("\t Failed to resolve the address: %s", host));
                 } else {
                     this.addr = newAddr;
-                    LOG.debug(String.format("Recreated quorum address for server %d: %s:%d",
-                              this.id, host, port));
+                    LOG.warn(String.format("\t Recreated quorum address for server %d: %s",
+                              this.id, newAddr));
                 }
             }
             if (this.electionAddr != null) {
@@ -146,11 +148,11 @@ public class QuorumPeer extends Thread implements QuorumStats.Provider {
                 InetSocketAddress newAddr = new InetSocketAddress(host, port);
                 if (newAddr.isUnresolved()) {
                     // Don't update the address if DNS resolution failed.
-                    LOG.warn(String.format("Failed to resolve the address: %s", host));
+                    LOG.warn(String.format("\t Failed to resolve the address: %s", host));
                 } else {
                     this.electionAddr = newAddr;
-                    LOG.debug(String.format("Recreated election address for server %d: %s:%d",
-                              this.id, host, port));
+                    LOG.warn(String.format("\t Recreated election address for server %d: %s",
+                              this.id, newAddr));
                 }
             }
         }

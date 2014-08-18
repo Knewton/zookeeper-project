@@ -32,6 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.Date;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -352,6 +353,26 @@ public class QuorumCnxManager {
      */
     
     synchronized void connectOne(long sid){
+        
+        LOG.debug("connectOne() being called, for sid: " + sid);
+
+        // Logging state of quorumPeers
+        for (Map.Entry<Long, QuorumPeer.QuorumServer> entry : self.quorumPeers.entrySet()) {
+            Long key = entry.getKey();
+            QuorumPeer.QuorumServer value = entry.getValue();
+            LOG.debug("quorumPeers info for sid: " + key);
+            LOG.debug("\t election address: " + value.electionAddr);
+            LOG.debug("\t quorum address: " + value.addr);
+        }
+
+        // Logging state of senderWorkerMap
+        for (Map.Entry<Long, SendWorker> entry : senderWorkerMap.entrySet()) {
+            Long key = entry.getKey();
+            SendWorker value = entry.getValue();
+            LOG.debug("senderWorkerMap info for sid: " + key);
+            LOG.debug("\t SocketChannel address: " + value.channel.socket().getInetAddress());
+        }
+
         if (senderWorkerMap.get(sid) == null){
             InetSocketAddress electionAddr;
             if(self.quorumPeers.containsKey(sid))
