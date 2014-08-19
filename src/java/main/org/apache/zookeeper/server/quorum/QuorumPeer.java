@@ -148,8 +148,40 @@ public class QuorumPeer extends ZooKeeperThread implements QuorumStats.Provider 
             this.electionAddr = null;
             this.clientAddr = null;
         }
-        
-        
+
+        /**
+         * Reinitializes server address and election address to perform DNS
+         * resolution.
+         */
+        public void recreateSocketAddresses() {
+            if (this.addr != null) {
+                String host = HostNameUtils.getHostString(this.addr);
+                int port = this.addr.getPort();
+                InetSocketAddress newAddr = new InetSocketAddress(host, port);
+                if (newAddr.isUnresolved()) {
+                    // Don't update the address if DNS resolution failed.
+                    LOG.warn("Failed to resolve the address: {}", host);
+                } else {
+                    this.addr = newAddr;
+                    LOG.debug("Recreated quorum address for server {}: {}:{}",
+                              this.id, host, port);
+                }
+            }
+            if (this.electionAddr != null) {
+                String host = HostNameUtils.getHostString(this.electionAddr);
+                int port = this.electionAddr.getPort();
+                InetSocketAddress newAddr = new InetSocketAddress(host, port);
+                if (newAddr.isUnresolved()) {
+                    // Don't update the address if DNS resolution failed.
+                    LOG.warn("Failed to resolve the address: {}", host);
+                } else {
+                    this.electionAddr = newAddr;
+                    LOG.debug("Recreated election address for server {}: {}:{}",
+                              this.id, host, port);
+                }
+            }
+        }
+
         private void setType(String s) throws ConfigException {
             if (s.toLowerCase().equals("observer")) {
                type = LearnerType.OBSERVER;
