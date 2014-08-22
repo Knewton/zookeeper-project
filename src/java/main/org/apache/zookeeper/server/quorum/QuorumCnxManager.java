@@ -353,8 +353,11 @@ public class QuorumCnxManager {
      */
     
     synchronized void connectOne(long sid){
-        
         LOG.debug("connectOne() being called, for sid: " + sid);
+        
+        LOG.debug("JVM DNS Cache Settings: ");
+        LOG.debug("\t networkaddress.cache.ttl: " + java.security.Security.getProperty("networkaddress.cache.ttl"));
+        LOG.debug("\t networkaddress.cache.negative.ttl: " + java.security.Security.getProperty("networkaddress.cache.negative.ttl"));
 
         // Logging state of quorumPeers
         for (Map.Entry<Long, QuorumPeer.QuorumServer> entry : self.quorumPeers.entrySet()) {
