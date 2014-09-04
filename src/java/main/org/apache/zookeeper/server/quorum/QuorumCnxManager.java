@@ -420,6 +420,24 @@ public class QuorumCnxManager {
             }
         } else {
             LOG.debug("There is a connection already for server " + sid);
+
+            // check if quorumPeer IP and the sendWorker IP differ for this sid
+            if(self.quorumPeers.containsKey(sid)) {
+                InetSocketAddress electionAddr = self.quorumPeers.get(sid).electionAddr;
+                String quorumPeerIP = electionAddr.getAddress().getHostAddress();
+                
+                SendWorker sw = senderWorkerMap.get(sid);
+                String sendWorkerIP = sw.channel.socket().getInetAddress().getHostAddress();
+                
+                LOG.debug("\t Comparing IPs for sid: " + sid);
+                LOG.debug("\t\t quorumPeerIP: " + quorumPeerIP);
+                LOG.debug("\t\t sendWorkerIP: " + sendWorkerIP);
+                
+                if (!quorumPeerIP.equals(sendWorkerIP)) {
+                    LOG.debug("\t IP's differ, calling recreateSocketAddresses()");
+                    self.getView().get(sid).recreateSocketAddresses();
+                }
+            }
         }
     }
     
