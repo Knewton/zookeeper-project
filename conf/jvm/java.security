@@ -170,7 +170,7 @@ ssl.TrustManagerFactory.algorithm=PKIX
 #       serious security implications. Do not set it unless 
 #       you are sure you are not exposed to DNS spoofing attack.
 #
-#networkaddress.cache.ttl=-1 
+networkaddress.cache.ttl=0
 
 # The Java-level namelookup cache policy for failed lookups:
 #
@@ -185,7 +185,7 @@ ssl.TrustManagerFactory.algorithm=PKIX
 # results for 10 seconds. 
 #
 #
-networkaddress.cache.negative.ttl=10
+networkaddress.cache.negative.ttl=0
 
 #
 # Properties to configure OCSP for certificate revocation checking
